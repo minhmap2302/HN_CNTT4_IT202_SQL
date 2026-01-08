@@ -1,108 +1,129 @@
 create database hackathon;
 use hackathon;
+
+
 create table Category (
-	category_id	VARCHAR(10) primary key,
-	category_name VARCHAR(100) unique,
-	descriptions TEXT
+    category_id varchar(10) primary key,
+    category_name varchar(100) unique,
+    descriptions text
 );
 
 create table Product (
-	product_id VARCHAR(10) primary key,
-	product_name VARCHAR(150),
-	price DECIMAL(10, 2) not null check (price > 0),
-	status enum('available','Out of Stock'),
-	category_id	VARCHAR(10),
-	foreign key (category_id) references Category (category_id)
+    product_id varchar(10) primary key,
+    product_name varchar(150),
+    price decimal(10,2) not null check (price > 0),
+    status enum('Available','Out of Stock'),
+    category_id varchar(10),
+    foreign key (category_id) references Category(category_id)
 );
 
 create table Orders (
-	order_id  INT primary key auto_increment,
-	order_date DATETIME,
-	total_amount DECIMAL(15, 2),
-	customer_name VARCHAR(100) 
+    order_id int primary key auto_increment,
+    order_date datetime,
+    total_amount decimal(15,2),
+    customer_name varchar(100)
 );
 
 create table Order_detail (
-	detail_id	INT primary key auto_increment,
-	order_id	INT,
-	product_id	VARCHAR(10),
-	quantity	INT,
-	subtotal	DECIMAL(12, 2)
+    detail_id int primary key auto_increment,
+    order_id int,
+    product_id varchar(10),
+    quantity int,
+    subtotal decimal(12,2),
+    foreign key (order_id) references Orders(order_id),
+    foreign key (product_id) references Product(product_id)
 );
 
-insert into Category (category_id,category_name,descriptions) values
-('C01', 'Coffee', 'All types of coffee beans and brews'),
-('C02', 'Tea & Fruit', 'Fresh fruit juices and tea'),
-('C03', 'Bakery', 'Cakes and pastries');
+insert into Category values
+('C01','Coffee','All types of coffee beans and brews'),
+('C02','Tea & Fruit','Fresh fruit juices and tea'),
+('C03','Bakery','Cakes and pastries');
 
-insert into Product (product_id, product_name, price, status, category_id) values
-('P001','Espresso',35000.00,'Available','C01'),
-('P002','Matcha Latte',45000.00,'Available','C02'),
-('P003','Tiramisu',55000.00,'Available','C03'),
-('P004','Cold Brew',50000.00,'Out of Stock','C04'),
-('P005','Croissant',30000.00,'Available','C05');
+-- cau 2
 
-insert into Orders (order_id, order_date, total_amount, customer_name) values 
-(1, '2025-01-01 08:30:00',80000.00,'Mr. An'),
-('2', '2025-01-01 09:15:00','45000.00','Ms. Hoa'),
-('3', '2025-01-02 14:00:00','140000.00','CompletedMr. Binh'),
-('4', '2025-01-03 10:00:00','35000.00','Anonymous'),
-('5', '2025-01-03 11:20:00','90000.00','Ms. Lan');
+insert into Product values
+('P001','Espresso',35000,'Available','C01'),
+('P002','Matcha Latte',45000,'Available','C02'),
+('P003','Tiramisu',55000,'Available','C03'),
+('P004','Cold Brew',50000,'Out of Stock','C01'),
+('P005','Croissant',30000,'Available','C03');
 
-insert into Order_detail (detail_id, order_id, product_id, quantity, subtotal) values
-(1,1,1,2,35000.00),
-(2,1,1,0,45000.00),
-(3,3,2,4,110000.00),
-(4,3,1,3,30000.00),
-(5,5,2,1,90000.00);
+insert into Orders (order_date,total_amount,customer_name) values
+('2025-01-01 08:30:00',80000,'Mr. An'),
+('2025-01-01 09:15:00',45000,'Ms. Hoa'),
+('2025-01-02 14:00:00',140000,'Mr. Binh'),
+('2025-01-03 10:00:00',35000,'Anonymous'),
+('2025-01-03 11:20:00',90000,'Ms. Lan');
 
-SELECT * FROM Category;
-SELECT * FROM Product;
-SELECT * FROM Orders;
-SELECT * FROM Order_items;
+insert into Order_detail (order_id,product_id,quantity,subtotal) values
+(1,'P001',1,35000),
+(1,'P002',1,45000),
+(3,'P002',2,110000),
+(3,'P001',1,30000),
+(5,'P002',2,90000);
 
--- Chuyển trạng thái (status) của sản phẩm 'Cold Brew' sang 'Available'
-update Product set status = 'available' where product_name = 'Cold Brew';
--- Tăng giá bán (price) thêm 10% cho tất cả các sản phẩm thuộc danh mục 'Bakery' (mã 'C03').
--- Xóa các chi tiết đơn hàng (order_details) có số lượng  bằng 0 hoặc nhỏ hơn
-delete from Order_details where quanlity = 0 or quanlity < 0;
--- Phần 2: Truy vấn dữ liệu cơ bản
--- Liệt kê product_id, product_name, price của các sản phẩm có giá từ 40,000 trở lên và đang còn hàng (Available).
-select product_id, product_name, price from Product where price >= 40.000 and status = 'Available';
--- Lấy thông tin order_id, order_date, customer_name của các khách hàng có tên bắt đầu bằng chữ 'M'.
-select order_id, order_date, customer_name from Orders where customer_name = 'm';
--- Hiển thị danh sách sản phẩm gồm: product_name, price. Sắp xếp theo giá giảm dần.
-select produccustomersstudentstudentstudentclasst_name, price from Product order by price desc;
--- Hiển thị danh sách sản phẩm, bỏ qua 2 sản phẩm đầu tiên và lấy 3 sản phẩm tiếp theo.
-select * from Product limit 3 offset 2; 
--- Phần 3: Truy vấn dữ liệu nâng cao
--- Hiển thị product_name, price và tên danh mục (category_name) của từng sản phẩm.
-select product_name, price from Product;
--- Liệt kê tất cả danh mục và các sản phẩm thuộc danh mục đó. Hiển thị cả những danh mục chưa có sản phẩm nào.
+-- update & delete
+-- câu 3
+update Product set status = 'Available' where product_name = 'Cold Brew';
 
--- Tính tổng doanh thu của quán theo từng ngày.
+-- câu 4
+update Product set price = price * 1.1 where category_id = 'C03';
 
--- Thống kê những đơn hàng (order_id) có từ 2 loại sản phẩm khác nhau trở lên trong order_detail.
-select g.guest_name,r.room_type,b.check_in 
-from bookings b
-join guests g on  b.guest_id = g.guest_id
-join rooms r on b.room_id = r.room_id;
--- Lấy danh sách sản phẩm có giá cao hơn giá trung bình của tất cả sản phẩm trong quán.
-SELECT customer_id, COUNT(*) AS total_orders
-FROM orders
-GROUP BY customer_id
-HAVING COUNT(*) = (
-    SELECT MAX(order_count)
-    FROM (
-        SELECT COUNT(*) AS order_count
-        FROM orders
-        GROUP BY customer_id
-    ) AS temp
-);
--- Hiển thị tên các khách hàng đã từng mua sản phẩm 'Matcha Latte'.
-select product_name from Product group by product_name = 'Matcha Latte';
--- Hiển thị bảng thông tin về đơn hàng gồm: order_id, order_date, product_name, quantity, subtotal.
+-- câu 5
+delete from Order_detail where quantity <= 0;
+
+-- câu 6
+select product_id, product_name, price from Product where price >= 40000 and status = 'Available';
+
+-- câu 7
+select order_id, order_date, customer_name from Orders where customer_name like 'M%';
+
+-- câu 8
+select product_name, price from Product order by price desc;
+
+-- câu 9
+select * from Orders order by order_date desc limit 3;
+
+-- câu 10
+select * from Product limit 3 offset 2;
+
+
+-- truy vấn nâng cao
+-- câu 11
+select p.product_name, p.price, c.category_name
+from Product p
+join Category c on p.category_id = c.category_id;
+
+-- câu 12
+select c.category_name, p.product_name
+from Category c
+left join Product p on c.category_id = p.category_id;
+
+-- câu 13
+select date(order_date) as order_day,
+       sum(total_amount) as total_revenue
+from Orders
+group by date(order_date);
+
+-- câu 14
+select order_id
+from Order_detail
+
+
+-- câu 15
+select *
+from Product
+where price > (select avg(price) from Product);
+
+-- câu 16
+select distinct o.customer_name
+from Orders o
+join Order_detail od on o.order_id = od.order_id
+join Product p on od.product_id = p.product_id
+where p.product_name = 'Matcha Latte';
+
+-- câu 17
 select o.order_id, o.order_date, p.product_name, od.quantity, od.subtotal
 from Orders o
-join Product p on p.product_name = o.product_name
-join Order_detail od on od.quantity = o.quantity;
+join Order_detail od on o.order_id = od.order_id
+join Product p on od.product_id = p.product_id;
