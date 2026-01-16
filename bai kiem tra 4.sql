@@ -126,9 +126,14 @@ delimiter ;
 
 -- Cau 6
 delimiter //
-create stored procedure sp_DeleteStudentGrade
-  
-delimiter //
+create procedure sp_DeleteStudentGrade(
+	in p_StudentID char(5),
+    in p_SubjectID char(5)
+)
+begin
+	
+	
+end //
 
 
 
